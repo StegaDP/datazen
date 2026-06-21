@@ -768,6 +768,82 @@ impl Render for RootView {
                                             ),
                                     ),
                             )
+                            .when(selected_connection.is_none(), |column| {
+                                column.child(
+                                    workspace_welcome(
+                                        self.i18n.tr("workspace.welcome"),
+                                        self.i18n.tr("workspace.welcome_hint"),
+                                    )
+                                    .child(
+                                        welcome_action_card(
+                                            "Pg",
+                                            self.i18n.tr("actions.create_postgres"),
+                                            self.i18n.tr("workspace.databases"),
+                                            db_kind_color(DatabaseKind::PostgreSql),
+                                        )
+                                        .on_mouse_up(
+                                            MouseButton::Left,
+                                            cx.listener(|view, _, _, cx| {
+                                                view.form.clear(cx);
+                                                view.form.database_kind = DatabaseKind::PostgreSql;
+                                                view.show_form = true;
+                                                cx.notify();
+                                            }),
+                                        ),
+                                    )
+                                    .child(
+                                        welcome_action_card(
+                                            "My",
+                                            self.i18n.tr("actions.create_mysql"),
+                                            self.i18n.tr("workspace.tables"),
+                                            db_kind_color(DatabaseKind::MySql),
+                                        )
+                                        .on_mouse_up(
+                                            MouseButton::Left,
+                                            cx.listener(|view, _, _, cx| {
+                                                view.form.clear(cx);
+                                                view.form.database_kind = DatabaseKind::MySql;
+                                                view.show_form = true;
+                                                cx.notify();
+                                            }),
+                                        ),
+                                    )
+                                    .child(
+                                        welcome_action_card(
+                                            "Sq",
+                                            self.i18n.tr("actions.create_sqlite"),
+                                            self.i18n.tr("workspace.preview"),
+                                            db_kind_color(DatabaseKind::Sqlite),
+                                        )
+                                        .on_mouse_up(
+                                            MouseButton::Left,
+                                            cx.listener(|view, _, _, cx| {
+                                                view.form.clear(cx);
+                                                view.form.database_kind = DatabaseKind::Sqlite;
+                                                view.show_form = true;
+                                                cx.notify();
+                                            }),
+                                        ),
+                                    )
+                                    .child(
+                                        welcome_action_card(
+                                            "Rd",
+                                            self.i18n.tr("actions.create_redis"),
+                                            self.i18n.tr("terminal.title"),
+                                            db_kind_color(DatabaseKind::Redis),
+                                        )
+                                        .on_mouse_up(
+                                            MouseButton::Left,
+                                            cx.listener(|view, _, _, cx| {
+                                                view.form.clear(cx);
+                                                view.form.database_kind = DatabaseKind::Redis;
+                                                view.show_form = true;
+                                                cx.notify();
+                                            }),
+                                        ),
+                                    ),
+                                )
+                            })
                             .child(
                                 div()
                                     .flex_1()
@@ -1284,7 +1360,7 @@ impl Render for RootView {
                         .absolute()
                         .top(px(88.))
                         .right(px(28.))
-                        .w(px(260.))
+                        .w(px(320.))
                         .rounded_xl()
                         .border_1()
                         .border_color(rgb(BORDER_SOFT))
@@ -1298,6 +1374,30 @@ impl Render for RootView {
                                 .text_sm()
                                 .font_weight(gpui::FontWeight::BOLD)
                                 .child(self.i18n.tr("selector.change_language")),
+                        )
+                        .child(
+                            div()
+                                .rounded_lg()
+                                .border_1()
+                                .border_color(rgb(BORDER))
+                                .bg(rgb(SURFACE_ALT))
+                                .px_3()
+                                .py_2()
+                                .flex()
+                                .justify_between()
+                                .items_center()
+                                .child(
+                                    div()
+                                        .text_sm()
+                                        .text_color(rgb(TEXT_MUTED))
+                                        .child(self.i18n.tr("selector.language")),
+                                )
+                                .child(
+                                    div()
+                                        .text_sm()
+                                        .font_weight(gpui::FontWeight::BOLD)
+                                        .child(self.i18n.language_label(self.i18n.language())),
+                                ),
                         )
                         .children(ALL_LANGUAGES.iter().copied().map(|language| {
                             let active = self.i18n.language() == language;
@@ -1686,6 +1786,105 @@ fn quick_start_button(
                 .child(badge),
         )
         .child(div().text_sm().child(text))
+}
+
+fn workspace_welcome(title: impl Into<SharedString>, hint: impl Into<SharedString>) -> gpui::Div {
+    let title: SharedString = title.into();
+    let hint: SharedString = hint.into();
+    div()
+        .rounded_xl()
+        .border_1()
+        .border_color(rgb(BORDER))
+        .bg(rgb(SURFACE))
+        .p_4()
+        .flex()
+        .flex_col()
+        .gap_3()
+        .child(
+            div()
+                .flex()
+                .items_center()
+                .gap_3()
+                .child(
+                    div()
+                        .size_12()
+                        .rounded_xl()
+                        .bg(rgb(ACCENT_SOFT))
+                        .justify_center()
+                        .items_center()
+                        .flex()
+                        .text_color(rgb(ACCENT))
+                        .font_weight(gpui::FontWeight::BOLD)
+                        .child("DZ"),
+                )
+                .child(
+                    div()
+                        .flex()
+                        .flex_col()
+                        .gap_1()
+                        .child(
+                            div()
+                                .text_lg()
+                                .font_weight(gpui::FontWeight::BOLD)
+                                .child(title),
+                        )
+                        .child(div().text_sm().text_color(rgb(TEXT_MUTED)).child(hint)),
+                ),
+        )
+        .child(div().flex().gap_3().flex_wrap())
+}
+
+fn welcome_action_card(
+    badge: &'static str,
+    title: impl Into<SharedString>,
+    subtitle: impl Into<SharedString>,
+    color: u32,
+) -> gpui::Div {
+    let title: SharedString = title.into();
+    let subtitle: SharedString = subtitle.into();
+    div()
+        .w(px(220.))
+        .rounded_xl()
+        .border_1()
+        .border_color(rgb(BORDER))
+        .bg(rgb(SURFACE_ALT))
+        .px_3()
+        .py_3()
+        .flex()
+        .flex_col()
+        .gap_3()
+        .cursor_pointer()
+        .child(
+            div()
+                .flex()
+                .items_center()
+                .gap_3()
+                .child(
+                    div()
+                        .size_10()
+                        .rounded_lg()
+                        .bg(rgb(color))
+                        .justify_center()
+                        .items_center()
+                        .flex()
+                        .text_color(rgb(0x081018))
+                        .font_weight(gpui::FontWeight::BOLD)
+                        .child(badge),
+                )
+                .child(
+                    div()
+                        .flex()
+                        .flex_col()
+                        .gap_1()
+                        .child(div().text_sm().font_weight(gpui::FontWeight::BOLD).child(title))
+                        .child(
+                            div()
+                                .text_xs()
+                                .text_color(rgb(TEXT_SOFT))
+                                .child(subtitle),
+                        ),
+                ),
+        )
 }
 
 fn support_chip(label: &'static str, color: u32) -> impl IntoElement {
