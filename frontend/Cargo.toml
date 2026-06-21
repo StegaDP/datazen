@@ -8,5 +8,7 @@ publish = false
 anyhow = "1"
 backend = { path = "../backend" }
 gpui = "0.2.2"
+once_cell = "1"
+serde_yaml = "0.9"
 tracing = "0.1"
 unicode-segmentation = "1"

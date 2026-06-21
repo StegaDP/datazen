@@ -1,4 +1,8 @@
+use std::collections::HashMap;
+
 use backend::UiLanguage;
+use once_cell::sync::Lazy;
+use serde_yaml::Value;
 
 #[derive(Clone, Copy)]
 pub struct I18n {
@@ -19,35 +23,16 @@ impl I18n {
     }
 
     pub fn tr(self, key: &'static str) -> &'static str {
-        match self.language {
-            UiLanguage::English => lookup_with_fallback(ENGLISH, key),
-            UiLanguage::Spanish => lookup_with_fallback(SPANISH, key),
-            UiLanguage::Portuguese => lookup_with_fallback(PORTUGUESE, key),
-            UiLanguage::French => lookup_with_fallback(FRENCH, key),
-            UiLanguage::German => lookup_with_fallback(GERMAN, key),
-            UiLanguage::Russian => lookup_with_fallback(RUSSIAN, key),
-            UiLanguage::Ukrainian => lookup_with_fallback(UKRAINIAN, key),
-            UiLanguage::Mandarin => lookup_with_fallback(MANDARIN, key),
-            UiLanguage::Hindi => lookup_with_fallback(HINDI, key),
-            UiLanguage::Japanese => lookup_with_fallback(JAPANESE, key),
-            UiLanguage::Korean => lookup_with_fallback(KOREAN, key),
-        }
+        bundle(self.language)
+            .messages
+            .get(key)
+            .copied()
+            .or_else(|| ENGLISH.messages.get(key).copied())
+            .unwrap_or("")
     }
 
     pub fn language_label(self, language: UiLanguage) -> &'static str {
-        match language {
-            UiLanguage::English => "English",
-            UiLanguage::Spanish => "Spanish",
-            UiLanguage::Portuguese => "Portuguese",
-            UiLanguage::French => "French",
-            UiLanguage::German => "German",
-            UiLanguage::Russian => "Russian",
-            UiLanguage::Ukrainian => "Ukrainian",
-            UiLanguage::Mandarin => "Mandarin",
-            UiLanguage::Hindi => "Hindi",
-            UiLanguage::Japanese => "Japanese",
-            UiLanguage::Korean => "Korean",
-        }
+        bundle(language).autonym
     }
 }
 
@@ -65,501 +50,96 @@ pub const ALL_LANGUAGES: [UiLanguage; 11] = [
     UiLanguage::Korean,
 ];
 
-fn lookup_with_fallback(entries: &[(&'static str, &'static str)], key: &str) -> &'static str {
-    entries
-        .iter()
-        .find_map(|(entry_key, value)| (*entry_key == key).then_some(*value))
-        .unwrap_or_else(|| lookup(ENGLISH, key))
+struct LocaleBundle {
+    autonym: &'static str,
+    messages: HashMap<&'static str, &'static str>,
 }
 
-fn lookup(entries: &[(&'static str, &'static str)], key: &str) -> &'static str {
-    entries
-        .iter()
-        .find_map(|(entry_key, value)| (*entry_key == key).then_some(*value))
-        .unwrap_or("")
+static ENGLISH: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/en.yaml")));
+static SPANISH: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/es.yaml")));
+static PORTUGUESE: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/pt-PT.yaml")));
+static FRENCH: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/fr.yaml")));
+static GERMAN: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/de.yaml")));
+static RUSSIAN: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/ru.yaml")));
+static UKRAINIAN: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/uk.yaml")));
+static MANDARIN: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/zh-Hans.yaml")));
+static HINDI: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/hi.yaml")));
+static JAPANESE: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/ja.yaml")));
+static KOREAN: Lazy<LocaleBundle> =
+    Lazy::new(|| load_locale(include_str!("../locales/ko.yaml")));
+
+fn bundle(language: UiLanguage) -> &'static LocaleBundle {
+    match language {
+        UiLanguage::English => &ENGLISH,
+        UiLanguage::Spanish => &SPANISH,
+        UiLanguage::Portuguese => &PORTUGUESE,
+        UiLanguage::French => &FRENCH,
+        UiLanguage::German => &GERMAN,
+        UiLanguage::Russian => &RUSSIAN,
+        UiLanguage::Ukrainian => &UKRAINIAN,
+        UiLanguage::Mandarin => &MANDARIN,
+        UiLanguage::Hindi => &HINDI,
+        UiLanguage::Japanese => &JAPANESE,
+        UiLanguage::Korean => &KOREAN,
+    }
 }
 
-const ENGLISH: &[(&'static str, &'static str)] = &[
-    ("app.title", "DataZen Native"),
-    ("app.subtitle", "Rust backend and GPUI frontend in one executable"),
-    ("sidebar.connections", "Connections"),
-    ("sidebar.no_connections", "No saved connections yet"),
-    ("content.not_connected", "Connect to a database to load databases, tables, and queries."),
-    ("content.select_connection", "Pick a connection on the left or create a new one."),
-    ("content.databases", "Databases"),
-    ("content.tables", "Tables"),
-    ("content.preview", "Preview"),
-    ("content.query", "SQL query"),
-    ("content.results", "Results"),
-    ("form.new", "New connection"),
-    ("form.edit", "Edit connection"),
-    ("form.name", "Connection name"),
-    ("form.host", "Host"),
-    ("form.port", "Port"),
-    ("form.database", "Database"),
-    ("form.username", "Username"),
-    ("form.password", "Password"),
-    ("form.group", "Group"),
-    ("form.color", "Color tag"),
-    ("form.database_kind", "Database type"),
-    ("action.reload", "Reload"),
-    ("action.new", "New"),
-    ("action.edit", "Edit"),
-    ("action.save", "Save"),
-    ("action.cancel", "Cancel"),
-    ("action.delete", "Delete"),
-    ("action.connect", "Connect"),
-    ("action.disconnect", "Disconnect"),
-    ("action.test", "Test"),
-    ("action.run_query", "Run query"),
-    ("action.open_preview", "Preview table"),
-    ("status.ready", "Ready"),
-    ("status.loading", "Loading"),
-    ("status.saving", "Saving"),
-    ("status.testing", "Testing connection"),
-    ("status.connecting", "Connecting"),
-    ("status.connected", "Connected"),
-    ("status.disconnected", "Disconnected"),
-    ("query.placeholder", "SELECT * FROM your_table LIMIT 100"),
-    ("query.empty", "No query result yet"),
-    ("preview.empty", "Select a database and a table to load a preview."),
-];
+fn load_locale(source: &'static str) -> LocaleBundle {
+    let value: Value = serde_yaml::from_str(source).expect("locale yaml must be valid");
+    let mut flat = HashMap::new();
+    flatten("", &value, &mut flat);
 
-const SPANISH: &[(&'static str, &'static str)] = &[
-    ("app.subtitle", "Backend en Rust y frontend GPUI en un solo ejecutable"),
-    ("sidebar.connections", "Conexiones"),
-    ("sidebar.no_connections", "Aun no hay conexiones guardadas"),
-    ("content.not_connected", "Conectate a una base de datos para cargar bases, tablas y consultas."),
-    ("content.select_connection", "Elige una conexion a la izquierda o crea una nueva."),
-    ("content.databases", "Bases de datos"),
-    ("content.tables", "Tablas"),
-    ("content.preview", "Vista previa"),
-    ("content.query", "Consulta SQL"),
-    ("content.results", "Resultados"),
-    ("form.new", "Nueva conexion"),
-    ("form.edit", "Editar conexion"),
-    ("form.name", "Nombre de conexion"),
-    ("form.host", "Host"),
-    ("form.port", "Puerto"),
-    ("form.database", "Base de datos"),
-    ("form.username", "Usuario"),
-    ("form.password", "Contrasena"),
-    ("form.group", "Grupo"),
-    ("form.color", "Etiqueta de color"),
-    ("form.database_kind", "Tipo de base de datos"),
-    ("action.reload", "Recargar"),
-    ("action.new", "Nueva"),
-    ("action.edit", "Editar"),
-    ("action.save", "Guardar"),
-    ("action.cancel", "Cancelar"),
-    ("action.delete", "Eliminar"),
-    ("action.connect", "Conectar"),
-    ("action.disconnect", "Desconectar"),
-    ("action.test", "Probar"),
-    ("action.run_query", "Ejecutar consulta"),
-    ("action.open_preview", "Vista previa"),
-    ("status.ready", "Listo"),
-    ("status.loading", "Cargando"),
-    ("status.saving", "Guardando"),
-    ("status.testing", "Probando conexion"),
-    ("status.connecting", "Conectando"),
-    ("status.connected", "Conectado"),
-    ("status.disconnected", "Desconectado"),
-    ("query.empty", "Todavia no hay resultado"),
-    ("preview.empty", "Selecciona una base y una tabla para cargar una vista previa."),
-];
+    let autonym = leak(
+        flat.remove("meta.autonym")
+            .unwrap_or_else(|| "English".to_string()),
+    );
 
-const PORTUGUESE: &[(&'static str, &'static str)] = &[
-    ("app.subtitle", "Backend Rust e frontend GPUI num unico executavel"),
-    ("sidebar.connections", "Ligacoes"),
-    ("sidebar.no_connections", "Ainda nao existem ligacoes guardadas"),
-    ("content.not_connected", "Ligue-se a uma base de dados para carregar bases, tabelas e consultas."),
-    ("content.select_connection", "Escolha uma ligacao a esquerda ou crie uma nova."),
-    ("content.databases", "Bases de dados"),
-    ("content.tables", "Tabelas"),
-    ("content.preview", "Pre-visualizacao"),
-    ("content.query", "Consulta SQL"),
-    ("content.results", "Resultados"),
-    ("form.new", "Nova ligacao"),
-    ("form.edit", "Editar ligacao"),
-    ("form.name", "Nome da ligacao"),
-    ("form.port", "Porta"),
-    ("form.database", "Base de dados"),
-    ("form.username", "Utilizador"),
-    ("form.password", "Palavra-passe"),
-    ("form.group", "Grupo"),
-    ("form.color", "Cor"),
-    ("form.database_kind", "Tipo de base de dados"),
-    ("action.reload", "Recarregar"),
-    ("action.new", "Nova"),
-    ("action.edit", "Editar"),
-    ("action.save", "Guardar"),
-    ("action.cancel", "Cancelar"),
-    ("action.delete", "Apagar"),
-    ("action.connect", "Ligar"),
-    ("action.disconnect", "Desligar"),
-    ("action.test", "Testar"),
-    ("action.run_query", "Executar consulta"),
-    ("action.open_preview", "Ver tabela"),
-    ("status.ready", "Pronto"),
-    ("status.loading", "A carregar"),
-    ("status.saving", "A guardar"),
-    ("status.testing", "A testar ligacao"),
-    ("status.connecting", "A ligar"),
-    ("status.connected", "Ligado"),
-    ("status.disconnected", "Desligado"),
-    ("query.empty", "Ainda nao existe resultado"),
-    ("preview.empty", "Selecione uma base e uma tabela para carregar a pre-visualizacao."),
-];
+    let messages = flat
+        .into_iter()
+        .map(|(key, value)| (leak(key), leak(value)))
+        .collect();
 
-const FRENCH: &[(&'static str, &'static str)] = &[
-    ("app.subtitle", "Backend Rust et frontend GPUI dans un seul executable"),
-    ("sidebar.connections", "Connexions"),
-    ("sidebar.no_connections", "Aucune connexion enregistree"),
-    ("content.not_connected", "Connectez-vous a une base pour charger bases, tables et requetes."),
-    ("content.select_connection", "Choisissez une connexion a gauche ou creez-en une."),
-    ("content.databases", "Bases de donnees"),
-    ("content.tables", "Tables"),
-    ("content.preview", "Apercu"),
-    ("content.query", "Requete SQL"),
-    ("content.results", "Resultats"),
-    ("form.new", "Nouvelle connexion"),
-    ("form.edit", "Modifier la connexion"),
-    ("form.name", "Nom de la connexion"),
-    ("form.host", "Hote"),
-    ("form.port", "Port"),
-    ("form.database", "Base de donnees"),
-    ("form.username", "Utilisateur"),
-    ("form.password", "Mot de passe"),
-    ("form.group", "Groupe"),
-    ("form.color", "Couleur"),
-    ("form.database_kind", "Type de base de donnees"),
-    ("action.reload", "Recharger"),
-    ("action.new", "Nouvelle"),
-    ("action.edit", "Modifier"),
-    ("action.save", "Enregistrer"),
-    ("action.cancel", "Annuler"),
-    ("action.delete", "Supprimer"),
-    ("action.connect", "Connecter"),
-    ("action.disconnect", "Deconnecter"),
-    ("action.test", "Tester"),
-    ("action.run_query", "Executer la requete"),
-    ("action.open_preview", "Afficher la table"),
-    ("status.ready", "Pret"),
-    ("status.loading", "Chargement"),
-    ("status.saving", "Enregistrement"),
-    ("status.testing", "Test de la connexion"),
-    ("status.connecting", "Connexion"),
-    ("status.connected", "Connecte"),
-    ("status.disconnected", "Deconnecte"),
-    ("query.empty", "Aucun resultat pour le moment"),
-    ("preview.empty", "Selectionnez une base et une table pour charger un apercu."),
-];
+    LocaleBundle { autonym, messages }
+}
 
-const GERMAN: &[(&'static str, &'static str)] = &[
-    ("app.subtitle", "Rust-Backend und GPUI-Frontend in einer einzigen Datei"),
-    ("sidebar.connections", "Verbindungen"),
-    ("sidebar.no_connections", "Noch keine gespeicherten Verbindungen"),
-    ("content.not_connected", "Verbinde dich mit einer Datenbank, um Datenbanken, Tabellen und Abfragen zu laden."),
-    ("content.select_connection", "Waehle links eine Verbindung oder erstelle eine neue."),
-    ("content.databases", "Datenbanken"),
-    ("content.tables", "Tabellen"),
-    ("content.preview", "Vorschau"),
-    ("content.query", "SQL-Abfrage"),
-    ("content.results", "Ergebnisse"),
-    ("form.new", "Neue Verbindung"),
-    ("form.edit", "Verbindung bearbeiten"),
-    ("form.name", "Verbindungsname"),
-    ("form.host", "Host"),
-    ("form.port", "Port"),
-    ("form.database", "Datenbank"),
-    ("form.username", "Benutzername"),
-    ("form.password", "Passwort"),
-    ("form.group", "Gruppe"),
-    ("form.color", "Farbmarkierung"),
-    ("form.database_kind", "Datenbanktyp"),
-    ("action.reload", "Neu laden"),
-    ("action.new", "Neu"),
-    ("action.edit", "Bearbeiten"),
-    ("action.save", "Speichern"),
-    ("action.cancel", "Abbrechen"),
-    ("action.delete", "Loeschen"),
-    ("action.connect", "Verbinden"),
-    ("action.disconnect", "Trennen"),
-    ("action.test", "Testen"),
-    ("action.run_query", "Abfrage ausfuehren"),
-    ("action.open_preview", "Tabelle anzeigen"),
-    ("status.ready", "Bereit"),
-    ("status.loading", "Laden"),
-    ("status.saving", "Speichern"),
-    ("status.testing", "Verbindung wird getestet"),
-    ("status.connecting", "Verbinden"),
-    ("status.connected", "Verbunden"),
-    ("status.disconnected", "Getrennt"),
-    ("query.empty", "Noch kein Abfrageergebnis"),
-    ("preview.empty", "Waehle eine Datenbank und Tabelle fuer die Vorschau."),
-];
+fn flatten(prefix: &str, value: &Value, out: &mut HashMap<String, String>) {
+    match value {
+        Value::Mapping(mapping) => {
+            for (key, nested) in mapping {
+                let Value::String(key) = key else {
+                    continue;
+                };
+                let next = if prefix.is_empty() {
+                    key.clone()
+                } else {
+                    format!("{prefix}.{key}")
+                };
+                flatten(&next, nested, out);
+            }
+        }
+        Value::String(text) => {
+            out.insert(prefix.to_string(), text.clone());
+        }
+        Value::Bool(flag) => {
+            out.insert(prefix.to_string(), flag.to_string());
+        }
+        Value::Number(number) => {
+            out.insert(prefix.to_string(), number.to_string());
+        }
+        _ => {}
+    }
+}
 
-const RUSSIAN: &[(&'static str, &'static str)] = &[
-    ("app.subtitle", "Rust backend i GPUI frontend v odnom ispolnyaemom fayle"),
-    ("sidebar.connections", "Podklyucheniya"),
-    ("sidebar.no_connections", "Sokhranennykh podklyucheniy eshche net"),
-    ("content.not_connected", "Podklyuchites k baze dannykh, chtoby zagruzit bazy, tablitsy i zaprosy."),
-    ("content.select_connection", "Vyberite podklyuchenie sleva ili sozdajte novoe."),
-    ("content.databases", "Bazy dannykh"),
-    ("content.tables", "Tablitsy"),
-    ("content.preview", "Predprosmotr"),
-    ("content.query", "SQL zapros"),
-    ("content.results", "Rezultaty"),
-    ("form.new", "Novoe podklyuchenie"),
-    ("form.edit", "Redaktirovat podklyuchenie"),
-    ("form.name", "Imya podklyucheniya"),
-    ("form.host", "Host"),
-    ("form.port", "Port"),
-    ("form.database", "Baza dannykh"),
-    ("form.username", "Imya polzovatelya"),
-    ("form.password", "Parol"),
-    ("form.group", "Gruppa"),
-    ("form.color", "Tsvetovaya metka"),
-    ("form.database_kind", "Tip bazy dannykh"),
-    ("action.reload", "Obnovit"),
-    ("action.new", "Novoe"),
-    ("action.edit", "Redaktirovat"),
-    ("action.save", "Sohranit"),
-    ("action.cancel", "Otmena"),
-    ("action.delete", "Udalit"),
-    ("action.connect", "Podklyuchit"),
-    ("action.disconnect", "Otklyuchit"),
-    ("action.test", "Proverit"),
-    ("action.run_query", "Vypolnit zapros"),
-    ("action.open_preview", "Otkryt tablicu"),
-    ("status.ready", "Gotovo"),
-    ("status.loading", "Zagruzka"),
-    ("status.saving", "Sohranenie"),
-    ("status.testing", "Proverka podklyucheniya"),
-    ("status.connecting", "Podklyuchenie"),
-    ("status.connected", "Podklyucheno"),
-    ("status.disconnected", "Otklyucheno"),
-    ("query.empty", "Rezultatov poka net"),
-    ("preview.empty", "Vyberite bazu i tablitsu dlya predprosmotra."),
-];
-
-const UKRAINIAN: &[(&'static str, &'static str)] = &[
-    ("app.subtitle", "Rust backend i GPUI frontend v odnomu vykonuvanomu faili"),
-    ("sidebar.connections", "Pidklyuchennya"),
-    ("sidebar.no_connections", "Zberezhenykh pidklyuchen shche nemae"),
-    ("content.not_connected", "Pidklyuchitsya do bazy danykh, shchob zavantazhyty bazy, tablytsi ta zapyty."),
-    ("content.select_connection", "Vyberit pidklyuchennya zliva abo stvoryt nove."),
-    ("content.databases", "Bazy danykh"),
-    ("content.tables", "Tablytsi"),
-    ("content.preview", "Poperedniy perehlyad"),
-    ("content.query", "SQL zapyt"),
-    ("content.results", "Rezultaty"),
-    ("form.new", "Nove pidklyuchennya"),
-    ("form.edit", "Redahuvaty pidklyuchennya"),
-    ("form.name", "Nazva pidklyuchennya"),
-    ("form.host", "Host"),
-    ("form.port", "Port"),
-    ("form.database", "Baza danykh"),
-    ("form.username", "Imya korystuvacha"),
-    ("form.password", "Parol"),
-    ("form.group", "Hrupa"),
-    ("form.color", "Kolirna mitka"),
-    ("form.database_kind", "Typ bazy danykh"),
-    ("action.reload", "Onovyty"),
-    ("action.new", "Nove"),
-    ("action.edit", "Redahuvaty"),
-    ("action.save", "Zberehty"),
-    ("action.cancel", "Skasuvaty"),
-    ("action.delete", "Vydalyty"),
-    ("action.connect", "Pidklyuchyty"),
-    ("action.disconnect", "Vidklyuchyty"),
-    ("action.test", "Pereviryty"),
-    ("action.run_query", "Vykonaty zapyt"),
-    ("action.open_preview", "Vidkryty tablytsyu"),
-    ("status.ready", "Hotovo"),
-    ("status.loading", "Zavantazhennya"),
-    ("status.saving", "Zberezhennya"),
-    ("status.testing", "Perevirka pidklyuchennya"),
-    ("status.connecting", "Pidklyuchennya"),
-    ("status.connected", "Pidklyucheno"),
-    ("status.disconnected", "Vidklyucheno"),
-    ("query.empty", "Rezultativ shche nemae"),
-    ("preview.empty", "Obyrit bazu ta tablytsyu dlya poperednogo perehlyadu."),
-];
-
-const MANDARIN: &[(&'static str, &'static str)] = &[
-    ("app.subtitle", "Rust houduan yu GPUI qianduan dabao wei dange ke zhixing wenjian"),
-    ("sidebar.connections", "Lianjie"),
-    ("sidebar.no_connections", "Hai mei you baocun de lianjie"),
-    ("content.not_connected", "Qing xian lianjie shujuku yi jiazai shujuku, biao he chaxun."),
-    ("content.select_connection", "Qing zai zuoce xuanze lianjie huo chuangjian xin lianjie."),
-    ("content.databases", "Shujuku"),
-    ("content.tables", "Biao"),
-    ("content.preview", "Yulan"),
-    ("content.query", "SQL chaxun"),
-    ("content.results", "Jieguo"),
-    ("form.new", "Xin lianjie"),
-    ("form.edit", "Bianji lianjie"),
-    ("form.name", "Lianjie mingcheng"),
-    ("form.host", "Zhuji"),
-    ("form.port", "Duankou"),
-    ("form.database", "Shujuku"),
-    ("form.username", "Yonghuming"),
-    ("form.password", "Mima"),
-    ("form.group", "Fenzu"),
-    ("form.color", "Yanse biaoji"),
-    ("form.database_kind", "Shujuku leixing"),
-    ("action.reload", "Shuaxin"),
-    ("action.new", "Xinjian"),
-    ("action.edit", "Bianji"),
-    ("action.save", "Baocun"),
-    ("action.cancel", "Quxiao"),
-    ("action.delete", "Shanchu"),
-    ("action.connect", "Lianjie"),
-    ("action.disconnect", "Duankai"),
-    ("action.test", "Ceshi"),
-    ("action.run_query", "Zhixing chaxun"),
-    ("action.open_preview", "Yulan biao"),
-    ("status.ready", "Jiuxu"),
-    ("status.loading", "Jiazai zhong"),
-    ("status.saving", "Baocun zhong"),
-    ("status.testing", "Zhengzai ceshi lianjie"),
-    ("status.connecting", "Lianjie zhong"),
-    ("status.connected", "Yi lianjie"),
-    ("status.disconnected", "Yi duankai"),
-    ("query.empty", "Zanwu chaxun jieguo"),
-    ("preview.empty", "Qing xuanze shujuku he biao lai jiazai yulan."),
-];
-
-const HINDI: &[(&'static str, &'static str)] = &[
-    ("app.subtitle", "Rust backend aur GPUI frontend ek hi executable mein"),
-    ("sidebar.connections", "Connections"),
-    ("sidebar.no_connections", "Abhi tak koi saved connection nahin hai"),
-    ("content.not_connected", "Database, tables aur queries load karne ke liye pehle connect karein."),
-    ("content.select_connection", "Baen taraf se connection chunen ya naya banayen."),
-    ("content.databases", "Databases"),
-    ("content.tables", "Tables"),
-    ("content.preview", "Preview"),
-    ("content.query", "SQL query"),
-    ("content.results", "Results"),
-    ("form.new", "Naya connection"),
-    ("form.edit", "Connection edit karein"),
-    ("form.name", "Connection name"),
-    ("form.host", "Host"),
-    ("form.port", "Port"),
-    ("form.database", "Database"),
-    ("form.username", "Username"),
-    ("form.password", "Password"),
-    ("form.group", "Group"),
-    ("form.color", "Color tag"),
-    ("form.database_kind", "Database type"),
-    ("action.reload", "Reload"),
-    ("action.new", "New"),
-    ("action.edit", "Edit"),
-    ("action.save", "Save"),
-    ("action.cancel", "Cancel"),
-    ("action.delete", "Delete"),
-    ("action.connect", "Connect"),
-    ("action.disconnect", "Disconnect"),
-    ("action.test", "Test"),
-    ("action.run_query", "Run query"),
-    ("action.open_preview", "Preview table"),
-    ("status.ready", "Ready"),
-    ("status.loading", "Loading"),
-    ("status.saving", "Saving"),
-    ("status.testing", "Testing connection"),
-    ("status.connecting", "Connecting"),
-    ("status.connected", "Connected"),
-    ("status.disconnected", "Disconnected"),
-    ("query.empty", "Abhi koi result nahin hai"),
-    ("preview.empty", "Preview load karne ke liye database aur table chunen."),
-];
-
-const JAPANESE: &[(&'static str, &'static str)] = &[
-    ("app.subtitle", "Rust bakkuendo to GPUI furontoendo o tanitsu no jikko fairu ni togo"),
-    ("sidebar.connections", "Setsuzoku"),
-    ("sidebar.no_connections", "Mada hozon sareta setsuzoku wa arimasen"),
-    ("content.not_connected", "Database, table, query o yomu mae ni setsuzoku shite kudasai."),
-    ("content.select_connection", "Hidari kara setsuzoku o erabu ka atarashiku sakusei shite kudasai."),
-    ("content.databases", "Databases"),
-    ("content.tables", "Tables"),
-    ("content.preview", "Preview"),
-    ("content.query", "SQL query"),
-    ("content.results", "Results"),
-    ("form.new", "Atarashii setsuzoku"),
-    ("form.edit", "Setsuzoku o henshu"),
-    ("form.name", "Setsuzoku mei"),
-    ("form.host", "Host"),
-    ("form.port", "Port"),
-    ("form.database", "Database"),
-    ("form.username", "User name"),
-    ("form.password", "Password"),
-    ("form.group", "Group"),
-    ("form.color", "Color tag"),
-    ("form.database_kind", "Database shubetsu"),
-    ("action.reload", "Reload"),
-    ("action.new", "New"),
-    ("action.edit", "Edit"),
-    ("action.save", "Save"),
-    ("action.cancel", "Cancel"),
-    ("action.delete", "Delete"),
-    ("action.connect", "Connect"),
-    ("action.disconnect", "Disconnect"),
-    ("action.test", "Test"),
-    ("action.run_query", "Run query"),
-    ("action.open_preview", "Preview table"),
-    ("status.ready", "Ready"),
-    ("status.loading", "Loading"),
-    ("status.saving", "Saving"),
-    ("status.testing", "Testing connection"),
-    ("status.connecting", "Connecting"),
-    ("status.connected", "Connected"),
-    ("status.disconnected", "Disconnected"),
-    ("query.empty", "Mada kekka wa arimasen"),
-    ("preview.empty", "Preview o yomu tame ni database to table o sentaku shite kudasai."),
-];
-
-const KOREAN: &[(&'static str, &'static str)] = &[
-    ("app.subtitle", "Rust baegendeu wa GPUI peuronteuendeu-reul hana-ui silhaeng paillo tonghap"),
-    ("sidebar.connections", "Yeongyeol"),
-    ("sidebar.no_connections", "Ajik jeojangdoen yeongyeol-i eopseumnida"),
-    ("content.not_connected", "Database, table, query-reul bulleooryeomyeon meonjeo yeongyeolhaseyo."),
-    ("content.select_connection", "Oenjjogeseo yeongyeol-eul seontaekhageona saero mandeuseyo."),
-    ("content.databases", "Databases"),
-    ("content.tables", "Tables"),
-    ("content.preview", "Preview"),
-    ("content.query", "SQL query"),
-    ("content.results", "Results"),
-    ("form.new", "Sae yeongyeol"),
-    ("form.edit", "Yeongyeol pyeonjib"),
-    ("form.name", "Yeongyeol ireum"),
-    ("form.host", "Host"),
-    ("form.port", "Port"),
-    ("form.database", "Database"),
-    ("form.username", "Username"),
-    ("form.password", "Password"),
-    ("form.group", "Group"),
-    ("form.color", "Color tag"),
-    ("form.database_kind", "Database type"),
-    ("action.reload", "Reload"),
-    ("action.new", "New"),
-    ("action.edit", "Edit"),
-    ("action.save", "Save"),
-    ("action.cancel", "Cancel"),
-    ("action.delete", "Delete"),
-    ("action.connect", "Connect"),
-    ("action.disconnect", "Disconnect"),
-    ("action.test", "Test"),
-    ("action.run_query", "Run query"),
-    ("action.open_preview", "Preview table"),
-    ("status.ready", "Ready"),
-    ("status.loading", "Loading"),
-    ("status.saving", "Saving"),
-    ("status.testing", "Testing connection"),
-    ("status.connecting", "Connecting"),
-    ("status.connected", "Connected"),
-    ("status.disconnected", "Disconnected"),
-    ("query.empty", "Ajik gyeolgwa-ga eopseumnida"),
-    ("preview.empty", "Preview-reul bulleooryeomyeon database wa table-eul seontaekhaseyo."),
-];
+fn leak(value: String) -> &'static str {
+    Box::leak(value.into_boxed_str())
+}

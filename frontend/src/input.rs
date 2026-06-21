@@ -72,6 +72,11 @@ impl TextInput {
         cx.notify();
     }
 
+    pub fn set_placeholder(&mut self, value: impl Into<SharedString>, cx: &mut Context<Self>) {
+        self.placeholder = value.into();
+        cx.notify();
+    }
+
     fn displayed_text(&self) -> SharedString {
         if self.masked && !self.content.is_empty() {
             "•".repeat(self.content.graphemes(true).count()).into()
