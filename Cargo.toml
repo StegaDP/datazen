@@ -1,0 +1,20 @@
+[package]
+name = "datazen-native"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+members = ["backend", "frontend"]
+resolver = "2"
+
+[dependencies]
+frontend = { path = "frontend" }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

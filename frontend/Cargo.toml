@@ -1,0 +1,12 @@
+[package]
+name = "frontend"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+anyhow = "1"
+backend = { path = "../backend" }
+gpui = "0.2.2"
+tracing = "0.1"
+unicode-segmentation = "1"
