@@ -731,14 +731,14 @@ impl Render for RootView {
                                             .gap_3()
                                             .child(brand_mark())
                                             .child(
-                                                rail_button("＋", self.i18n.tr("actions.new"))
+                                                rail_button("+", self.i18n.tr("actions.new"))
                                                     .on_mouse_up(
                                                         MouseButton::Left,
                                                         cx.listener(Self::on_new_connection),
                                                     ),
                                             )
                                             .child(
-                                                rail_button("↻", self.i18n.tr("actions.reload"))
+                                                rail_button("\u{21BB}", self.i18n.tr("actions.reload"))
                                                     .on_mouse_up(
                                                         MouseButton::Left,
                                                         cx.listener(Self::on_reload),
@@ -768,82 +768,6 @@ impl Render for RootView {
                                             ),
                                     ),
                             )
-                            .when(selected_connection.is_none(), |column| {
-                                column.child(
-                                    workspace_welcome(
-                                        self.i18n.tr("workspace.welcome"),
-                                        self.i18n.tr("workspace.welcome_hint"),
-                                    )
-                                    .child(
-                                        welcome_action_card(
-                                            "Pg",
-                                            self.i18n.tr("actions.create_postgres"),
-                                            self.i18n.tr("workspace.databases"),
-                                            db_kind_color(DatabaseKind::PostgreSql),
-                                        )
-                                        .on_mouse_up(
-                                            MouseButton::Left,
-                                            cx.listener(|view, _, _, cx| {
-                                                view.form.clear(cx);
-                                                view.form.database_kind = DatabaseKind::PostgreSql;
-                                                view.show_form = true;
-                                                cx.notify();
-                                            }),
-                                        ),
-                                    )
-                                    .child(
-                                        welcome_action_card(
-                                            "My",
-                                            self.i18n.tr("actions.create_mysql"),
-                                            self.i18n.tr("workspace.tables"),
-                                            db_kind_color(DatabaseKind::MySql),
-                                        )
-                                        .on_mouse_up(
-                                            MouseButton::Left,
-                                            cx.listener(|view, _, _, cx| {
-                                                view.form.clear(cx);
-                                                view.form.database_kind = DatabaseKind::MySql;
-                                                view.show_form = true;
-                                                cx.notify();
-                                            }),
-                                        ),
-                                    )
-                                    .child(
-                                        welcome_action_card(
-                                            "Sq",
-                                            self.i18n.tr("actions.create_sqlite"),
-                                            self.i18n.tr("workspace.preview"),
-                                            db_kind_color(DatabaseKind::Sqlite),
-                                        )
-                                        .on_mouse_up(
-                                            MouseButton::Left,
-                                            cx.listener(|view, _, _, cx| {
-                                                view.form.clear(cx);
-                                                view.form.database_kind = DatabaseKind::Sqlite;
-                                                view.show_form = true;
-                                                cx.notify();
-                                            }),
-                                        ),
-                                    )
-                                    .child(
-                                        welcome_action_card(
-                                            "Rd",
-                                            self.i18n.tr("actions.create_redis"),
-                                            self.i18n.tr("terminal.title"),
-                                            db_kind_color(DatabaseKind::Redis),
-                                        )
-                                        .on_mouse_up(
-                                            MouseButton::Left,
-                                            cx.listener(|view, _, _, cx| {
-                                                view.form.clear(cx);
-                                                view.form.database_kind = DatabaseKind::Redis;
-                                                view.show_form = true;
-                                                cx.notify();
-                                            }),
-                                        ),
-                                    ),
-                                )
-                            })
                             .child(
                                 div()
                                     .flex_1()
@@ -889,80 +813,6 @@ impl Render for RootView {
                                             self.i18n.tr("sidebar.empty_hint"),
                                             self.i18n.tr("sidebar.supported"),
                                         ))
-                                        .child(
-                                            sidebar_quickstart(
-                                                self.i18n.tr("sidebar.quick_start"),
-                                                self.i18n.tr("sidebar.templates_hint"),
-                                            )
-                                            .child(
-                                                quick_start_button(
-                                                    "Pg",
-                                                    self.i18n.tr("actions.create_postgres"),
-                                                    db_kind_color(DatabaseKind::PostgreSql),
-                                                )
-                                                .on_mouse_up(
-                                                    MouseButton::Left,
-                                                    cx.listener(|view, _, _, cx| {
-                                                        view.form.clear(cx);
-                                                        view.form.database_kind =
-                                                            DatabaseKind::PostgreSql;
-                                                        view.show_form = true;
-                                                        cx.notify();
-                                                    }),
-                                                ),
-                                            )
-                                            .child(
-                                                quick_start_button(
-                                                    "My",
-                                                    self.i18n.tr("actions.create_mysql"),
-                                                    db_kind_color(DatabaseKind::MySql),
-                                                )
-                                                .on_mouse_up(
-                                                    MouseButton::Left,
-                                                    cx.listener(|view, _, _, cx| {
-                                                        view.form.clear(cx);
-                                                        view.form.database_kind =
-                                                            DatabaseKind::MySql;
-                                                        view.show_form = true;
-                                                        cx.notify();
-                                                    }),
-                                                ),
-                                            )
-                                            .child(
-                                                quick_start_button(
-                                                    "Sq",
-                                                    self.i18n.tr("actions.create_sqlite"),
-                                                    db_kind_color(DatabaseKind::Sqlite),
-                                                )
-                                                .on_mouse_up(
-                                                    MouseButton::Left,
-                                                    cx.listener(|view, _, _, cx| {
-                                                        view.form.clear(cx);
-                                                        view.form.database_kind =
-                                                            DatabaseKind::Sqlite;
-                                                        view.show_form = true;
-                                                        cx.notify();
-                                                    }),
-                                                ),
-                                            )
-                                            .child(
-                                                quick_start_button(
-                                                    "Rd",
-                                                    self.i18n.tr("actions.create_redis"),
-                                                    db_kind_color(DatabaseKind::Redis),
-                                                )
-                                                .on_mouse_up(
-                                                    MouseButton::Left,
-                                                    cx.listener(|view, _, _, cx| {
-                                                        view.form.clear(cx);
-                                                        view.form.database_kind =
-                                                            DatabaseKind::Redis;
-                                                        view.show_form = true;
-                                                        cx.notify();
-                                                    }),
-                                                ),
-                                            ),
-                                        )
                                     })
                                     .children(grouped_connections.into_iter().map(
                                         |(group, connections)| {
@@ -1075,9 +925,9 @@ impl Render for RootView {
                                             .gap_2()
                                             .child(
                                                 subtle_button(
-                                                    "◎",
+                                                    "\u{25CE}",
                                                     format!(
-                                                        "{} · {}",
+                                                        "{} \u{00B7} {}",
                                                         self.i18n.tr("selector.language"),
                                                         self.i18n.language_label(
                                                             self.i18n.language()
@@ -1090,7 +940,7 @@ impl Render for RootView {
                                                 ),
                                             )
                                             .child(
-                                                subtle_button("✎", self.i18n.tr("actions.edit"))
+                                                subtle_button("\u{270E}", self.i18n.tr("actions.edit"))
                                                     .on_mouse_up(
                                                         MouseButton::Left,
                                                         cx.listener(Self::on_edit_selected),
@@ -1098,7 +948,7 @@ impl Render for RootView {
                                             )
                                             .child(
                                                 danger_button(
-                                                    "⌫",
+                                                    "\u{232B}",
                                                     self.i18n.tr("actions.delete"),
                                                 )
                                                 .on_mouse_up(
@@ -1108,7 +958,7 @@ impl Render for RootView {
                                             )
                                             .child(if self.session.is_some() {
                                                 accent_button(
-                                                    "⨯",
+                                                    "\u{2715}",
                                                     self.i18n.tr("actions.disconnect"),
                                                 )
                                                 .on_mouse_up(
@@ -1118,7 +968,7 @@ impl Render for RootView {
                                                 .into_any_element()
                                             } else {
                                                 accent_button(
-                                                    "⇄",
+                                                    "\u{21C4}",
                                                     self.i18n.tr("actions.connect"),
                                                 )
                                                 .on_mouse_up(
@@ -1129,12 +979,89 @@ impl Render for RootView {
                                             }),
                                     ),
                             )
-                            .child(
-                                div()
-                                    .flex_1()
-                                    .flex()
-                                    .gap_3()
+                            .when(selected_connection.is_none(), |column| {
+                                column.child(
+                                    workspace_welcome(
+                                        self.i18n.tr("workspace.welcome"),
+                                        self.i18n.tr("workspace.welcome_hint"),
+                                    )
                                     .child(
+                                        welcome_action_card(
+                                            "Pg",
+                                            self.i18n.tr("actions.create_postgres"),
+                                            self.i18n.tr("workspace.databases"),
+                                            db_kind_color(DatabaseKind::PostgreSql),
+                                        )
+                                        .on_mouse_up(
+                                            MouseButton::Left,
+                                            cx.listener(|view, _, _, cx| {
+                                                view.form.clear(cx);
+                                                view.form.database_kind = DatabaseKind::PostgreSql;
+                                                view.show_form = true;
+                                                cx.notify();
+                                            }),
+                                        ),
+                                    )
+                                    .child(
+                                        welcome_action_card(
+                                            "My",
+                                            self.i18n.tr("actions.create_mysql"),
+                                            self.i18n.tr("workspace.tables"),
+                                            db_kind_color(DatabaseKind::MySql),
+                                        )
+                                        .on_mouse_up(
+                                            MouseButton::Left,
+                                            cx.listener(|view, _, _, cx| {
+                                                view.form.clear(cx);
+                                                view.form.database_kind = DatabaseKind::MySql;
+                                                view.show_form = true;
+                                                cx.notify();
+                                            }),
+                                        ),
+                                    )
+                                    .child(
+                                        welcome_action_card(
+                                            "Sq",
+                                            self.i18n.tr("actions.create_sqlite"),
+                                            self.i18n.tr("workspace.preview"),
+                                            db_kind_color(DatabaseKind::Sqlite),
+                                        )
+                                        .on_mouse_up(
+                                            MouseButton::Left,
+                                            cx.listener(|view, _, _, cx| {
+                                                view.form.clear(cx);
+                                                view.form.database_kind = DatabaseKind::Sqlite;
+                                                view.show_form = true;
+                                                cx.notify();
+                                            }),
+                                        ),
+                                    )
+                                    .child(
+                                        welcome_action_card(
+                                            "Rd",
+                                            self.i18n.tr("actions.create_redis"),
+                                            self.i18n.tr("terminal.title"),
+                                            db_kind_color(DatabaseKind::Redis),
+                                        )
+                                        .on_mouse_up(
+                                            MouseButton::Left,
+                                            cx.listener(|view, _, _, cx| {
+                                                view.form.clear(cx);
+                                                view.form.database_kind = DatabaseKind::Redis;
+                                                view.show_form = true;
+                                                cx.notify();
+                                            }),
+                                        ),
+                                    ),
+                                )
+                            })
+                            .child(div().when(selected_connection.is_some(), |content| {
+                                content.child(
+                                    div()
+                                        .flex_1()
+                                        .flex()
+                                        .gap_3()
+                                        .child(
                                         div()
                                             .w(px(320.))
                                             .flex()
@@ -1165,7 +1092,7 @@ impl Render for RootView {
                                                                         let db =
                                                                             database.clone();
                                                                         list_row(
-                                                                            "▣",
+                                                                            "\u{25A6}",
                                                                             database,
                                                                             "",
                                                                             selected,
@@ -1217,7 +1144,7 @@ impl Render for RootView {
                                                                         table.table_type.clone()
                                                                     });
                                                                 list_row(
-                                                                    "≡",
+                                                                    "\u{2261}",
                                                                     &table.name,
                                                                     detail,
                                                                     selected,
@@ -1237,24 +1164,25 @@ impl Render for RootView {
                                                 }),
                                             ),
                                     )
-                                    .child(
-                                        div()
-                                            .flex_1()
-                                            .flex()
-                                            .flex_col()
-                                            .gap_3()
-                                            .child(
-                                                workspace_panel(self.i18n.tr("workspace.preview"))
-                                                    .child(render_preview(
-                                                        self.table_preview.as_ref(),
-                                                        self.i18n.tr("workspace.sample"),
-                                                        self.i18n.tr("workspace.not_connected"),
-                                                        self.i18n.tr("stats.columns"),
-                                                        self.i18n.tr("stats.rows"),
-                                                    )),
-                                            ),
-                                    ),
-                            )
+                                        .child(
+                                            div()
+                                                .flex_1()
+                                                .flex()
+                                                .flex_col()
+                                                .gap_3()
+                                                .child(
+                                                    workspace_panel(self.i18n.tr("workspace.preview"))
+                                                        .child(render_preview(
+                                                            self.table_preview.as_ref(),
+                                                            self.i18n.tr("workspace.sample"),
+                                                            self.i18n.tr("workspace.not_connected"),
+                                                            self.i18n.tr("stats.columns"),
+                                                            self.i18n.tr("stats.rows"),
+                                                        )),
+                                                ),
+                                        ),
+                                )
+                            }))
                             .child(
                                 terminal_panel(
                                     self.i18n.tr("terminal.title"),
@@ -1280,7 +1208,7 @@ impl Render for RootView {
                                         .child(div().flex_1().child(self.query_input.clone()))
                                         .child(
                                             accent_button(
-                                                "▶",
+                                                "\u{25B6}",
                                                 self.i18n.tr("actions.run_query"),
                                             )
                                             .on_mouse_up(
@@ -1360,20 +1288,50 @@ impl Render for RootView {
                         .absolute()
                         .top(px(88.))
                         .right(px(28.))
-                        .w(px(320.))
+                        .w(px(360.))
                         .rounded_xl()
                         .border_1()
                         .border_color(rgb(BORDER_SOFT))
                         .bg(rgb(SURFACE_ELEVATED))
-                        .p_3()
+                        .p_4()
                         .flex()
                         .flex_col()
-                        .gap_2()
+                        .gap_3()
                         .child(
                             div()
-                                .text_sm()
-                                .font_weight(gpui::FontWeight::BOLD)
-                                .child(self.i18n.tr("selector.change_language")),
+                                .flex()
+                                .justify_between()
+                                .items_center()
+                                .child(
+                                    div()
+                                        .flex()
+                                        .flex_col()
+                                        .gap_1()
+                                        .child(
+                                            div()
+                                                .text_sm()
+                                                .font_weight(gpui::FontWeight::BOLD)
+                                                .child(self.i18n.tr("selector.change_language")),
+                                        )
+                                        .child(
+                                            div()
+                                                .text_xs()
+                                                .text_color(rgb(TEXT_SOFT))
+                                                .child(self.i18n.tr("selector.language")),
+                                        ),
+                                )
+                                .child(
+                                    div()
+                                        .rounded_full()
+                                        .bg(rgb(ACCENT_SOFT))
+                                        .border_1()
+                                        .border_color(rgb(BORDER))
+                                        .px_3()
+                                        .py_1()
+                                        .text_xs()
+                                        .text_color(rgb(ACCENT))
+                                        .child(self.i18n.language().as_code()),
+                                ),
                         )
                         .child(
                             div()
@@ -1399,20 +1357,26 @@ impl Render for RootView {
                                         .child(self.i18n.language_label(self.i18n.language())),
                                 ),
                         )
-                        .children(ALL_LANGUAGES.iter().copied().map(|language| {
-                            let active = self.i18n.language() == language;
-                            language_row(
-                                self.i18n.language_label(language),
-                                language.as_code(),
-                                active,
-                            )
-                            .on_mouse_up(
-                                MouseButton::Left,
-                                cx.listener(move |view, _, window, cx| {
-                                    view.cycle_language(language, window, cx);
-                                }),
-                            )
-                        })),
+                        .child(
+                            div()
+                                .flex()
+                                .flex_col()
+                                .gap_2()
+                                .children(ALL_LANGUAGES.iter().copied().map(|language| {
+                                    let active = self.i18n.language() == language;
+                                    language_row(
+                                        self.i18n.language_label(language),
+                                        language.as_code(),
+                                        active,
+                                    )
+                                    .on_mouse_up(
+                                        MouseButton::Left,
+                                        cx.listener(move |view, _, window, cx| {
+                                            view.cycle_language(language, window, cx);
+                                        }),
+                                    )
+                                })),
+                        ),
                 )
             })
             .when(self.show_form, |root| {
@@ -1491,7 +1455,7 @@ impl Render for RootView {
                                         .gap_2()
                                         .child(
                                             subtle_button(
-                                                "×",
+                                                "\u{2715}",
                                                 self.i18n.tr("actions.cancel"),
                                             )
                                             .on_mouse_up(
@@ -1501,7 +1465,7 @@ impl Render for RootView {
                                         )
                                         .child(
                                             subtle_button(
-                                                "◌",
+                                                "\u{25CC}",
                                                 self.i18n.tr("actions.test"),
                                             )
                                             .on_mouse_up(
@@ -1511,7 +1475,7 @@ impl Render for RootView {
                                         )
                                         .child(
                                             accent_button(
-                                                "✓",
+                                                "\u{2713}",
                                                 self.i18n.tr("actions.save"),
                                             )
                                             .on_mouse_up(
@@ -1552,7 +1516,7 @@ fn connection_identity(connection: &ConnectionSummary) -> String {
     if database.is_empty() {
         host
     } else {
-        format!("{host} · {database}")
+        format!("{host} \u{00B7} {database}")
     }
 }
 
@@ -2053,6 +2017,7 @@ fn connection_card(connection: &ConnectionSummary, selected: bool) -> gpui::Div 
 fn terminal_panel(title: impl Into<SharedString>, helper: impl Into<SharedString>, identity: String) -> gpui::Div {
     let title: SharedString = title.into();
     let helper: SharedString = helper.into();
+    let header_identity = identity.clone();
     div()
         .h(px(292.))
         .rounded_xl()
@@ -2078,7 +2043,7 @@ fn terminal_panel(title: impl Into<SharedString>, helper: impl Into<SharedString
                     div()
                         .text_xs()
                         .text_color(rgb(TEXT_SOFT))
-                        .child(identity),
+                        .child(header_identity),
                 ),
         )
         .child(
@@ -2097,9 +2062,22 @@ fn terminal_panel(title: impl Into<SharedString>, helper: impl Into<SharedString
                         .flex()
                         .items_center()
                         .gap_2()
-                        .child(div().text_color(rgb(DANGER)).child("●"))
-                        .child(div().text_color(rgb(WARNING)).child("●"))
-                        .child(div().text_color(rgb(SUCCESS)).child("●")),
+                        .child(div().text_color(rgb(DANGER)).child("\u{25CF}"))
+                        .child(div().text_color(rgb(WARNING)).child("\u{25CF}"))
+                        .child(div().text_color(rgb(SUCCESS)).child("\u{25CF}"))
+                        .child(
+                            div()
+                                .ml_auto()
+                                .rounded_full()
+                                .border_1()
+                                .border_color(rgb(TERMINAL_EDGE))
+                                .bg(rgb(0x0b1822))
+                                .px_2()
+                                .py_1()
+                                .text_xs()
+                                .text_color(rgb(TERMINAL_AMBER))
+                                .child(identity),
+                        ),
                 )
                 .child(
                     div()
@@ -2118,17 +2096,54 @@ fn language_row(label: impl Into<SharedString>, code: &str, active: bool) -> gpu
         .border_color(rgb(if active { ACCENT } else { BORDER }))
         .bg(rgb(if active { ACCENT_SOFT } else { SURFACE_ALT }))
         .px_3()
-        .py_2()
+        .py_3()
         .flex()
         .justify_between()
         .items_center()
         .cursor_pointer()
-        .child(div().text_sm().child(label))
         .child(
             div()
+                .flex()
+                .items_center()
+                .gap_3()
+                .child(
+                    div()
+                        .rounded_full()
+                        .bg(rgb(if active { ACCENT } else { SURFACE }))
+                        .border_1()
+                        .border_color(rgb(if active { ACCENT } else { BORDER }))
+                        .px_2()
+                        .py_1()
+                        .text_xs()
+                        .text_color(rgb(if active { 0x06121d } else { TEXT_SOFT }))
+                        .child(code.to_uppercase()),
+                )
+                .child(
+                    div()
+                        .text_sm()
+                        .font_weight(if active {
+                            gpui::FontWeight::BOLD
+                        } else {
+                            gpui::FontWeight::NORMAL
+                        })
+                        .child(label),
+                ),
+        )
+        .child(
+            div()
+                .rounded_full()
+                .bg(rgb(if active { ACCENT } else { SURFACE }))
+                .border_1()
+                .border_color(rgb(if active { ACCENT } else { BORDER }))
+                .px_2()
+                .py_1()
                 .text_xs()
-                .text_color(rgb(if active { ACCENT } else { TEXT_SOFT }))
-                .child(code.to_string()),
+                .text_color(rgb(if active { 0x06121d } else { TEXT_SOFT }))
+                .child(if active {
+                    "\u{2713}".to_string()
+                } else {
+                    code.to_string()
+                }),
         )
 }
 
@@ -2238,7 +2253,7 @@ fn render_query_terminal(
         Some(result) => {
             let affected = result
                 .rows_affected
-                .map(|value| format!(" · {value} affected"))
+                .map(|value| format!(" \u{00B7} {value} affected"))
                 .unwrap_or_default();
             div()
                 .flex()
@@ -2249,7 +2264,7 @@ fn render_query_terminal(
                         .text_sm()
                         .text_color(rgb(TERMINAL_GREEN))
                         .child(format!(
-                            "{} {} · {} {} · {} ms{}",
+                            "{} {} \u{00B7} {} {} \u{00B7} {} ms{}",
                             result.rows.len(),
                             row_label,
                             result.columns.len(),

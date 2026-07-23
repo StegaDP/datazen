@@ -79,7 +79,7 @@ impl TextInput {
 
     fn displayed_text(&self) -> SharedString {
         if self.masked && !self.content.is_empty() {
-            "•".repeat(self.content.graphemes(true).count()).into()
+            "\u{2022}".repeat(self.content.graphemes(true).count()).into()
         } else {
             self.content.clone()
         }
